@@ -5,13 +5,13 @@ class BDD:
     def __init__(self,levels,assertion):
         self._depth=levels
         self._truths=assertion
-        self._nodes=getNodes()
-        self._variables=getVariables()
+        self._nodes=self.getNodes()
+        self._variables=self.getVariables()
 
     #finds amount of variables in BDD
     def getNodes(self):
         amt=0
-        for x in range(self.depth):
+        for x in range(self._depth):
             amt+=x
         return amt
 
@@ -19,11 +19,12 @@ class BDD:
     def getVariables(self):
         varlist=[]
         numvar=0
-        for layer in range(1,self.depth+1):
+        for layer in range(1,self._depth+1):
             for variable in range(layer):
                 numvar+=1
                 var=BDDVariable(numvar,variable,layer,False)
                 varlist.append(var)
+        return varlist
 
     #takes two adjacent nodes and returns their adjacency
     #TP if the adjacency is completed using a truth
@@ -42,20 +43,20 @@ class BDD:
     #where direction 1 goes upward losing depth and direction 0
     #goes downward, gaining depth
     def findAdjacent(self,node1,path,direction):
-        for node in self.variables:
+        for node in _variables:
             if (path=="TP" and direction==1):
-                for data in findVariables(node1.getLevel()-1):
+                for data in self.findVariables(node1.getLevel()-1):
                     if(node1.getState()==node.getState()-(node1.getLevel()+1)):
                         return data
                         
             elif (path=="TP" and direction==0):
-                for data in findVariables(node1.getLevel()+1):
+                for data in self.findVariables(node1.getLevel()+1):
                     if(node1.getState()==node.getState()+(node1.getLevel()+1)):
                         return data
 
             elif (path=="FP" and direction==1):
                 count=0
-                varlist=findVariables(node1.getLevel())
+                varlist=self.findVariables(node1.getLevel())
                 for data in varlist:
                     count+=1
                     if (data==node1):
@@ -63,7 +64,7 @@ class BDD:
 
             elif (path=="FP" and direction==0):
                 count=0
-                varlist=findVariables(node1.getLevel())
+                varlist=self.findVariables(node1.getLevel())
                 for data in varlist:
                     count+=1
                     if(data==node1):
@@ -76,7 +77,7 @@ class BDD:
     #a list of them
     def findVariables(self, tlevel):
         ofTruths=[]
-        for node in self.variables:
+        for node in self._variables:
             if (node.getLevel()==tlevel):
                 ofTruths.append(node)
         return ofTruths
@@ -85,15 +86,15 @@ class BDD:
     #to assert the certain amount of truths specified
     #True if valid, False otherwise
     def decideValidity(self):
-        goalVars=findVariables(self.truths)
         varlist=[]
+        goalVars=self.findVariables(self._truths)
         countvar=0
         for variable in goalVars:
             countvar+=1
             variable.setValidity(True)
             varlist.append(variable)
-            for amt in range(1,self.truths+1):
-                varlist.append(findAdjacent(varlist[(countvar*amt)-1])
+            for amt in range(1,self._truths+1):
+                varlist.append(self.findAdjacent(varlist[(countvar*amt)-1]))
                 varlist[countvar*amt].setValidity(True)
 
     #writes CNF clauses using valid assertion variables 
@@ -107,7 +108,7 @@ class BDD:
         #(f -choose -true)
         #where f is the initial node
         #need to get variable name for chooser variable
-        choose=len(self.variables)+node.getLayer()
+        choose=len(self._variables)+node.getLayer()
         a=str(choose)
         if (node.checkValid):
             trueAdj=findAdjacent(node,'TP',0)
@@ -115,7 +116,7 @@ class BDD:
             b=str(trueAdj.getState())
             c=str(falseAdj.getState())
             f=str(node.getState())
-            if (!falseAdj.getValidity):
+            if (not falseAdj.getValidity):
                 cnf+=("-"+f+" "+a+" "+c+" 0\n")
                 cnf+=(f+" "+a+" 0\n")
             else:
@@ -127,7 +128,7 @@ class BDD:
 
     def writeAllClauses(self):
         cnf=""
-        for variable in range(self.variables):
+        for variable in range(self._variables):
             cnf+=writeClausesPerNode(variable)
         return cnf
 
