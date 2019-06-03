@@ -43,7 +43,7 @@ class BDD:
     #where direction 1 goes upward losing depth and direction 0
     #goes downward, gaining depth
     def findAdjacent(self,node1,path,direction):
-        for node in _variables:
+        for node in self._variables:
             if (path=="TP" and direction==1):
                 for data in self.findVariables(node1.getLevel()-1):
                     if(node1.getState()==node.getState()-(node1.getLevel()+1)):
@@ -94,7 +94,7 @@ class BDD:
             variable.setValidity(True)
             varlist.append(variable)
             for amt in range(1,self._truths+1):
-                varlist.append(self.findAdjacent(varlist[(countvar*amt)-1]))
+                varlist.append(self.findAdjacent(varlist[(countvar*amt)-1],'TP',1))
                 varlist[countvar*amt].setValidity(True)
 
     #writes CNF clauses using valid assertion variables 
