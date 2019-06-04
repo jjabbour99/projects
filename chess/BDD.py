@@ -42,32 +42,32 @@ class BDD:
     #a true or false path and a direction up or down the diagram
     #where direction 1 goes upward losing depth and direction 0
     #goes downward, gaining depth
-    def findAdjacent(self,node1,path,direction):
+    def findAdjacent(self,tnode,path,direction):
         for node in self._variables:
             if (path=="TP" and direction==1):
-                for data in self.findVariables(node1.getLevel()-1):
-                    if(node1.getState()==node.getState()-(node1.getLevel()+1)):
+                for data in self.findVariables(tnode.getLevel()-1):
+                    if(tnode.getState()==node.getState()-tnode.getLevel()+1):
                         return data
                         
             elif (path=="TP" and direction==0):
-                for data in self.findVariables(node1.getLevel()+1):
-                    if(node1.getState()==node.getState()+(node1.getLevel()+1)):
+                for data in self.findVariables(tnode.getLevel()+1):
+                    if(tnode.getState()==node.getState()+(tnode.getLevel()+1)):
                         return data
 
             elif (path=="FP" and direction==1):
                 count=0
-                varlist=self.findVariables(node1.getLevel())
+                varlist=self.findVariables(tnode.getLevel())
                 for data in varlist:
                     count+=1
-                    if (data==node1):
+                    if (data==tnode):
                         return varlist[count-1]
 
             elif (path=="FP" and direction==0):
                 count=0
-                varlist=self.findVariables(node1.getLevel())
+                varlist=self.findVariables(tnode.getLevel())
                 for data in varlist:
                     count+=1
-                    if(data==node1):
+                    if(data==tnode):
                         return varlist[count+1]
 
             else:
@@ -94,6 +94,7 @@ class BDD:
             variable.setValidity(True)
             varlist.append(variable)
             for amt in range(1,self._truths+1):
+                print(varlist[(countvar*amt)-1])
                 varlist.append(self.findAdjacent(varlist[(countvar*amt)-1],'TP',1))
                 varlist[countvar*amt].setValidity(True)
 

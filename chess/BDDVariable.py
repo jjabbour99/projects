@@ -7,6 +7,9 @@ class BDDVariable:
         self.validity=valid
         self.ch=layer
 
+    def __str__(self):
+        return "BDDVariable with state %s, Truth Level %s, Layer %s, Validity %s" %(self.state,self.truthlevel, self.ch, self.validity)
+
     def getState(self):
         return self.state
 
